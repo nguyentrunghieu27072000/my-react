@@ -1,43 +1,93 @@
 import './App.css';
-import TodoList from './components/TodoList';
-import Textfield from '@atlaskit/textfield'
-import Button from '@atlaskit/button';
-import { useCallback, useEffect, useState } from 'react';
-import { v4 } from 'uuid';
+import { Component } from 'react';
+import LoginForm from './components/LoginForm';
+import {
+  Routes,
+  Route,
+  BrowserRouter,
+} from 'react-router-dom';
+import Home from './components/Home';
+import { ACCESS_TOKEN } from './constants/constant'
+class App extends Component {
 
-const TODO_APP_STORAGE_KEY = 'TODO_APP';
+  onUserNavigate() {
+    console.log('ok', localStorage.getItem(ACCESS_TOKEN))
+    if(!localStorage.getItem(ACCESS_TOKEN)) {
+      // window.location.pathname = "/signin";
+    }
+  }
 
-function App() {
-  const [todoList, setTodoList] = useState(() => {
-    return JSON.parse(localStorage.getItem(TODO_APP_STORAGE_KEY)) || []
-  });
-  const [textInput, setTextInput] = useState("");
-
-  useEffect(() =>{
-    localStorage.setItem(TODO_APP_STORAGE_KEY, JSON.stringify(todoList));
-  }, [todoList])
-
-  const onTextInputChange = useCallback((e) => {
-    setTextInput(e.target.value);
-  }, []);
-
-  const onAddBtnClick = useCallback((e) => {
-    setTodoList([{id: v4(), name: textInput, isCompleted: false}, ...todoList]);
-    setTextInput("");
-  }, [textInput, todoList]);
-
-  return (
-  <>
-    <h3>Danh sach can lam</h3>
-    <Textfield name="add-todo" placeholder="Them viec lam o day" 
-    elemAfterInput={<Button isDisabled={!textInput} appearance="primary" onClick={onAddBtnClick}>Them</Button>} 
-    css={{ padding: "2px 4px 2px"}}
-    value={textInput}
-    onChange={onTextInputChange}
-    ></Textfield>
-    <TodoList todoList={todoList}></TodoList>
-  </>
-  );
+  render() {
+    return (
+      <BrowserRouter>
+        <Routes>
+            <Route exact path='/' onEnter={this.onUserNavigate()} onChange={this.onUserNavigate()} element={< Home />}></Route>
+            <Route exact path='/login' element={< LoginForm />}></Route>
+        </Routes>
+      </BrowserRouter>
+   );
+  }
 }
+
+// function App() {
+//   // login with fb
+//   const [login, setLogin] = useState(false);
+//   const [data, setData] = useState({});
+//   const [picture, setPicture] = useState('');
+  
+//   const responseFacebook = (response) => {
+//     console.log(response);
+//     setData(response);
+//     setPicture(response.picture.data.url);
+//     if (response.accessToken) {
+//       setLogin(true);
+//     } else {
+//       setLogin(false);
+//     }
+//   }
+
+//   //login
+//   const Login = async (details) => {
+//     const data = details;
+//     const response = await loginAccount(data);
+//     localStorage.setItem(ACCESS_TOKEN, response.data['access_token']);
+//     console.log(response);
+//   }
+
+//   return (
+//   <>
+//     <div className="login">
+//       <LoginForm Login={Login}></LoginForm>
+//     </div>
+
+//     <div class="container">
+//       <Card style={{ width: '600px' }}>
+//         <Card.Header>
+//           {!login &&
+//             <FacebookLogin
+//               appId="720959082717599"
+//               autoLoad={true}
+//               fields="name,email,picture"
+//               scope="public_profile,user_friends"
+//               callback={responseFacebook}
+//               icon="fa-facebook" />
+//           }
+//           {login &&
+//             <Image src={picture} roundedCircle />
+//           }
+//         </Card.Header>
+//         {login &&
+//           <Card.Body>
+//             <Card.Title>{data.name}</Card.Title>
+//             <Card.Text>
+//               {data.email}
+//             </Card.Text>
+//           </Card.Body>
+//         }
+//       </Card>
+//     </div>
+//   </>
+//   );
+// }
 
 export default App;
